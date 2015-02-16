@@ -210,6 +210,7 @@ static NSString * const kSchemaKeywordPatternProperties = @"patternProperties";
         // enumerate and validate all schemas applicable to the property
         BOOL enumerationSuccess = [self enumerateSchemasForProperty:key withBlock:^(VVJSONSchema *schema, BOOL *innerStop) {
             if ([schema validateObject:obj inContext:context error:&internalError] == NO) {
+		NSLog(@"failing schema == %@", schema);	    
                 success = NO;
                 *innerStop = YES;
                 *stop = YES;
