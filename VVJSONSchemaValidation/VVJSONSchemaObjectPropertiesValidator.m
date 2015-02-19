@@ -210,7 +210,9 @@ static NSString * const kSchemaKeywordPatternProperties = @"patternProperties";
         // enumerate and validate all schemas applicable to the property
         BOOL enumerationSuccess = [self enumerateSchemasForProperty:key withBlock:^(VVJSONSchema *schema, BOOL *innerStop) {
             if ([schema validateObject:obj inContext:context error:&internalError] == NO) {
-		NSLog(@"failing schema == %@", schema);	    
+	        if(internalError) {
+                    internalError = [self appendErrorDescription:[NSString stringWithFormat:@"\n%@", schema] toError:internalError];
+                }
                 success = NO;
                 *innerStop = YES;
                 *stop = YES;
@@ -284,6 +286,24 @@ static NSString * const kSchemaKeywordPatternProperties = @"patternProperties";
     } else {
         return YES;
     }
+}
+
+- (NSError *)appendErrorDescription:(NSString *)appendage toError:(NSError *)error
+{
+    NSMutableDictionary *mutableUserInfoDictionary = [error.userInfo mutableCopy];
+    if(!mutableUserInfoDictionary) {
+        return error;
+    }
+
+    NSString *localizedDescription = [error.userInfo objectForKey:NSLocalizedDescriptionKey];
+    if(localizedDescription) {
+        [mutableUserInfoDictionary setObject:[localizedDescription stringByAppendingString:appendage] forKey:NSLocalizedDescriptionKey];
+    }
+
+    NSError *newError = [[NSError alloc] initWithDomain:error.domain
+                                                   code:error.code
+                                               userInfo:mutableUserInfoDictionary];
+    return newError;
 }
 
 @end
