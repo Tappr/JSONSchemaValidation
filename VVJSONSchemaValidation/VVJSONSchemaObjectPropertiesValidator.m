@@ -206,10 +206,14 @@ static NSString * const kSchemaKeywordPatternProperties = @"patternProperties";
     // validate each item with the corresponding schema
     __block BOOL success = YES;
     __block NSError *internalError = nil;
+    __block id failingName = nil;
+    __block id failingValue = nil;  
     [instance enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         // enumerate and validate all schemas applicable to the property
         BOOL enumerationSuccess = [self enumerateSchemasForProperty:key withBlock:^(VVJSONSchema *schema, BOOL *innerStop) {
             if ([schema validateObject:obj inContext:context error:&internalError] == NO) {
+                failingName = key;
+                failingValue = obj;    
                 success = NO;
                 *innerStop = YES;
                 *stop = YES;
@@ -226,7 +230,7 @@ static NSString * const kSchemaKeywordPatternProperties = @"patternProperties";
     
     if (success == NO) {
         if (error != NULL) {
-            *error = internalError;
+ 		*error = [NSError vv_JSONSchemaErrorWithCode:internalError.code failingObject:instance failingValidator:self failingName:failingName failingValue:failingValue];
         }
     }
     

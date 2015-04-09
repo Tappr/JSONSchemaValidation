@@ -57,4 +57,15 @@ typedef NS_ENUM(NSUInteger, VVJSONSchemaErrorCode) {
  */
 + (instancetype)vv_JSONSchemaErrorWithCode:(VVJSONSchemaErrorCode)code failingObject:(id)failingObject failingValidator:(id<VVJSONSchemaValidator>)failingValidator;
 
+/**
+Creates and returns an error object with `VVJSONSchemaErrorDomain` domain, specified error code and optional objects for `userInfo`.
+@param code Error code.
+@param failingObject Object that caused the error. Depending on the error code, it might be a failing JSON Schema or invalid JSON instance, or anything else. Returned error will contain this object under `VVJSONSchemaErrorFailingObjectKey` key in `userInfo`.
+@param failingValidator If error is caused by invalid JSON instance, this parameter should be the validator object that failed validation. Returned error will contain this object under `VVJSONSchemaErrorFailingValidatorKey` key in `userInfo`.
+@param failingName the name/key in the json that caused the failure
+@param failingValue the value in the json that caused the failure
+@return Configured error object.
+*/
++ (instancetype)vv_JSONSchemaErrorWithCode:(VVJSONSchemaErrorCode)code failingObject:(id)failingObject failingValidator:(id <VVJSONSchemaValidator>)failingValidator failingName:(NSString *)failingName failingValue:(NSString *)failingValue;
+
 @end
